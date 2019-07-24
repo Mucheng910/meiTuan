@@ -17,7 +17,7 @@
       <dd
         :class="{active:kind === 'spa'}"
         kind="spa"
-        keyword="丽人"
+        keyword="spa"
       >丽人SPA
       </dd>
       <dd
@@ -63,35 +63,7 @@
     data() {
       return {
         kind: 'all',
-        list: {
-          all: [
-            {
-              img: 'https://p0.meituan.net/mogu/b5940b1b9103e87a43f64fca533b5ea0101306.jpg@736w_416h_1e_1c',
-              title: '必胜客（阳光天地店）',
-              pos: '[半价] 豪华丰盛5-6人餐一份',
-              price: '369'
-            },
-            {
-              img: '//p0.meituan.net/codeman/e473bb428f070321269b23370ff02ba956209.jpg',
-              title: '1',
-              pos: '[半价] 豪华丰盛5-6人餐一份',
-              price: '369'
-            },
-            {
-              img: '//p0.meituan.net/codeman/e473bb428f070321269b23370ff02ba956209.jpg',
-              title: '2',
-              pos: '[半价] 豪华丰盛5-6人餐一份',
-              price: '369'
-            },
-            {
-              img: '//p0.meituan.net/codeman/e473bb428f070321269b23370ff02ba956209.jpg',
-              title: '3',
-              pos: '[半价] 豪华丰盛5-6人餐一份',
-              price: '369'
-            }
-          ],
-          spa: [{}]
-        }
+        list: {}
       }
     },
     computed: {
@@ -99,13 +71,59 @@
         return this.list[this.kind]
       }
     },
+    async mounted() {
+      let city = this.$store.state.geo.position.city.replace('市', '')
+      let {status, data: {count, pois}} = await this.$axios.get('/search/resultsByKeywords', {
+        params: {
+          city,
+          keywords: '景点'
+        }
+      })
+      if (status === 200 && count > 0) {
+        let r = pois.filter(item => item.photos.length).map(item => {
+          return {
+            title: item.name,
+            pos: item.type.split(';')[0],
+            price: item.biz_ext.cost || '暂无',
+            img: item.photos[0].url,
+            url: '//abc.com'
+          }
+        })
+        this.list = {
+          all: r.slice(0, 9)
+        }
+      } else {
+        this.list[this.kind] = []
+      }
+    },
     methods: {
-      artisticOver(e) {
+      async artisticOver(e) {
+        let city = this.$store.state.geo.position.city.replace('市', '')
         let dom = e.target
         let tagName = dom.tagName
         if (tagName === 'DD') {
           this.kind = dom.getAttribute('kind')
-          let keyWord = dom.getAttribute('keyword')
+          let keywords = dom.getAttribute('keyword')
+          let {status, data: {count, pois}} = await this.$axios.get('/search/resultsByKeywords', {
+            params: {
+              city,
+              keywords
+            }
+          })
+          if (status === 200 && count > 0) {
+            let r = pois.filter(item => item.photos.length).map(item => {
+              return {
+                title: item.name,
+                pos: item.type.split(';')[0],
+                price: item.biz_ext.cost || '暂无',
+                img: item.photos[0].url,
+                url: '//abc.com'
+              }
+            })
+            this.$set(this.list,this.kind,r.slice(0,9));
+          } else {
+            this.list[this.kind] = []
+          }
         }
       }
     }

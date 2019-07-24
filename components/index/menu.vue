@@ -2,7 +2,7 @@
   <div class="m-menu" @mouseleave="mouseLeave">
     <dl class="nav">
       <dt>全部分类</dt>
-      <dd v-for="(item, idx) in menu" :key="idx" @mouseenter="mouseEnter">
+      <dd v-for="(item, idx) in $store.state.home.menu" :key="idx" @mouseenter="mouseEnter">
         <i :class="item.type"></i> {{item.name}} <span class="arrow"></span>
       </dd>
     </dl>
@@ -26,43 +26,43 @@
     data() {
       return {
         kind: '',
-        menu: [
-          {
-            type: 'food',
-            name: '美食',
-            child: [{
-              title: "美食",
-              child: ["代金券", "甜点饮品", '火锅', '自助餐', '小吃快餐']
-            }]
-          },
-          {
-            type: 'takeout',
-            name: '外卖',
-            child: [{
-              title: "外卖",
-              child: ["美团外卖"]
-            }]
-          },
-          {
-            type: 'hotel',
-            name: '酒店',
-            child: [{
-              title: "酒店星际",
-              child: ["经济型", "舒适/三星", "高档/四星", "豪华/五星"]
-            },
-              {
-                title: "酒店星际",
-                child: ["经济型", "舒适/三星", "高档/四星", "豪华/五星"]
-              }
-            ]
-          }
-
-        ]
+        // menu: [
+        //   {
+        //     type: 'food',
+        //     name: '美食',
+        //     child: [{
+        //       title: "美食",
+        //       child: ["代金券", "甜点饮品", '火锅', '自助餐', '小吃快餐']
+        //     }]
+        //   },
+        //   {
+        //     type: 'takeout',
+        //     name: '外卖',
+        //     child: [{
+        //       title: "外卖",
+        //       child: ["美团外卖"]
+        //     }]
+        //   },
+        //   {
+        //     type: 'hotel',
+        //     name: '酒店',
+        //     child: [{
+        //       title: "酒店星际",
+        //       child: ["经济型", "舒适/三星", "高档/四星", "豪华/五星"]
+        //     },
+        //       {
+        //         title: "酒店星际",
+        //         child: ["经济型", "舒适/三星", "高档/四星", "豪华/五星"]
+        //       }
+        //     ]
+        //   }
+        //
+        // ]
       }
     },
     computed: {
       curDetail() {
-        return this.menu.filter((item) => {
+        return this.$store.state.home.menu.filter((item) => {
           return item.type === this.kind
         })[0] || ''
       }

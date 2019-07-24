@@ -25,36 +25,20 @@
             class="hotPlace"
           >
             <dt>热门搜索</dt>
-            <dd v-for="(item, idx) in hotPlace" :key="idx">{{item}}</dd>
+            <dd v-for="(item, idx) in $store.state.search.hotPlace.slice(0,5)" :key="idx">{{item.name}}</dd>
           </dl>
-          <!--                      <dt>热门搜索</dt>-->
-          <!--                      <dd-->
-          <!--              v-for="(item, index) in $store.state.search.hotPlace.slice(0, 5)"-->
-          <!--              :key="index">-->
-          <!--              {{ item.name }}</dd>-->
-          <!--          </dl>-->
           <dl
             v-if="isSearchList"
             class="searchList">
-            <dd v-for="(item, idx) in searchList " :key="idx">{{item}}</dd>
+            <dd v-for="(item, idx) in searchList " :key="idx">{{item.name}}</dd>
           </dl>
-          <!--            <dd-->
-          <!--              v-for="(item,index) in searchList"-->
-          <!--              :key="index"-->
-          <!--            {{ item.name }}</dd>-->
-          <!--          </dl>-->
-          <!--            <dl class="hotPlace">-->
-
         </div>
         <p class="suggest">
-          <!--          <a-->
-          <!--            v-for="(item, index) in $store.state.search.hotPlace.slice(0, 5)"-->
-          <!--            :key="index"-->
-          <!--            href="#"-->
-          <!--          >{{ item.name }}</a>-->
-          <a>hh</a>
-          <a>hh</a>
-          <a>hh</a>
+          <a
+            v-for="(item, index) in $store.state.search.hotPlace.slice(0, 5)"
+            :key="index"
+            href="#"
+          >{{ item.name }}</a>
         </p>
         <ul class="nav">
           <li>
@@ -113,13 +97,14 @@
 </template>
 
 <script>
+  import _ from 'lodash'
 
   export default {
     data() {
       return {
         isFocus: false,
-        hotPlace: ['h', 'x', 'y'],
-        searchList: ['h', 'x', 'y'],
+        hotPlace: [],
+        searchList: [],
         search: ''
       }
     },
@@ -141,23 +126,18 @@
           }, 200
         )
       },
-      input() {
-        console.log('input')
-      }
+      input: _.debounce(async function () {
+        let city = this.$store.state.geo.position.city.replace('市', '')
+        this.searchList = []
+        let {status, data: {top}} = await this.$axios.get('/search/top', {
+          params: {
+            input: this.search,
+            city
+          }
+        })
+        this.searchList = status === 200 ? top.slice(0, 10) : []
+      }, 300)
     }
-
-    // input: _.debounce(async function () {
-    //   let self = this;
-    //   let city = self.$store.state.geo.position.city.replace('市', '');
-    //   self.searchList = [];
-    //   let {status, data: {top}} = await self.$axios.get('/search/top', {
-    //     params: {
-    //       input: self.search,
-    //       city
-    //     }
-    //   })
-    //   self.searchList = top.slice(0, 10);
-    // }, 300)
   }
 </script>
 
